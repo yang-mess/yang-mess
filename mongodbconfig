@@ -39,3 +39,36 @@ public class MongoVenusTemplateConfig {
     }
 
 }
+
+
+/**
+ * 初始化venus mongoMpcTemplate
+ * 如果不是多mongo数据源无需引入该配置
+ * 注：开启多数据源配置需要排除springboot默认的mongo初始化机制
+ * @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+ * @author liangjian
+ * @date
+ */
+@Slf4j
+@Configuration
+@EnableMongoRepositories(basePackages = "com.example", mongoTemplateRef = "mongoVenusTemplate")
+
+public class MongoVenusTemplateConfig {
+    @Value("${spring.data.mongodb.venus.uri}")
+    private String uri;
+
+    @Primary
+    @Bean(name = "mongoVenusTemplate")
+    public MongoTemplate mongoVenusTemplate() throws Exception {
+        log.info("-----------------------init mongoMpcTemplate success-----------------------------------");
+        return new MongoTemplate(mongoVenusFactory());
+    }
+
+    @Bean
+    @Primary
+    public MongoDatabaseFactory mongoVenusFactory() throws Exception {
+        SimpleMongoClientDatabaseFactory simpleMongoClientDbFactory = new SimpleMongoClientDatabaseFactory(uri);
+        return simpleMongoClientDbFactory;
+    }
+
+}
